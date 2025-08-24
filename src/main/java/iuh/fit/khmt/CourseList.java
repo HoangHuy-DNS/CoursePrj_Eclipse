@@ -1,19 +1,13 @@
-/**
- * @description CourseList.java - This is Hoang Huy's code
- * @author Hoang Huy
- * @version 1.0
- * @created Aug 20, 2025 9:28:17 AM
- */
-
 package iuh.fit.khmt;
 import java.util.Arrays;
+
 /**
  * Lớp mô tả danh sách các khóa học trong trường học.
  * Cung cấp các thao tác thêm, xóa, tìm kiếm, sắp xếp.
  */
 public class CourseList {
     private Course[] courses;
-    private int size;
+    private int count;
 
     /**
      * Khởi tạo danh sách khóa học.
@@ -24,49 +18,59 @@ public class CourseList {
             throw new IllegalArgumentException("Length of the array must be greater than 0");
         }
         courses = new Course[capacity];
-        size = 0;
+        count = 0;
     }
 
     /**
      * Thêm một khóa học vào danh sách.
      * Nếu id đã tồn tại thì không thêm.
      * @param c khóa học cần thêm
+     * @return true nếu thêm thành công, false nếu trùng id
      */
-    public void addCourse(Course c) {
-        if (findById(c.getId()) != null) {
-            System.out.println("Error: Course with ID " + c.getId() + " already exists.");
-            return;
+    public boolean addCourse(Course c) {
+        if (exists(c)) {
+            return false;
         }
-        if (size >= courses.length) {
-            courses = Arrays.copyOf(courses, courses.length * 2); // tăng mảng động
+        if (count >= courses.length) {
+            courses = Arrays.copyOf(courses, courses.length * 2);
         }
-        courses[size++] = c;
+        courses[count++] = c;
+        return true;
+    }
+
+    /**
+     * Kiểm tra khóa học có tồn tại trong danh sách chưa.
+     * @param c khóa học cần kiểm tra
+     * @return true nếu tồn tại
+     */
+    public boolean exists(Course c) {
+        return searchCourseById(c.getId()) != null;
     }
 
     /**
      * Lấy toàn bộ danh sách khóa học.
      * @return mảng Course
      */
-    public Course[] getAllCourses() {
-        return Arrays.copyOf(courses, size);
+    public Course[] getCourses() {
+        return Arrays.copyOf(courses, count);
     }
 
     /**
      * Xóa một khóa học theo ID.
      * @param id mã khóa học
+     * @return true nếu xóa thành công, false nếu không tìm thấy
      */
-    public void removeById(String id) {
-        for (int i = 0; i < size; i++) {
+    public boolean removeCourse(String id) {
+        for (int i = 0; i < count; i++) {
             if (courses[i].getId().equals(id)) {
-                for (int j = i; j < size - 1; j++) {
+                for (int j = i; j < count - 1; j++) {
                     courses[j] = courses[j + 1];
                 }
-                courses[--size] = null;
-                System.out.println("Removed course with ID " + id);
-                return;
+                courses[--count] = null;
+                return true;
             }
         }
-        System.out.println("Error: Course ID not found.");
+        return false;
     }
 
     /**
@@ -74,8 +78,8 @@ public class CourseList {
      * @param id mã khóa học
      * @return Course nếu tìm thấy, ngược lại null
      */
-    public Course findById(String id) {
-        for (int i = 0; i < size; i++) {
+    public Course searchCourseById(String id) {
+        for (int i = 0; i < count; i++) {
             if (courses[i].getId().equals(id)) {
                 return courses[i];
             }
@@ -88,15 +92,15 @@ public class CourseList {
      * @param keyword từ khóa cần tìm
      * @return mảng Course nếu có, ngược lại null
      */
-    public Course[] searchByTitle(String keyword) {
-        Course[] result = new Course[size];
-        int count = 0;
-        for (int i = 0; i < size; i++) {
+    public Course[] searchCourse(String keyword) {
+        Course[] result = new Course[count];
+        int found = 0;
+        for (int i = 0; i < count; i++) {
             if (courses[i].getTitle().toLowerCase().contains(keyword.toLowerCase())) {
-                result[count++] = courses[i];
+                result[found++] = courses[i];
             }
         }
-        return count > 0 ? Arrays.copyOf(result, count) : null;
+        return found > 0 ? Arrays.copyOf(result, found) : null;
     }
 
     /**
@@ -104,23 +108,23 @@ public class CourseList {
      * @param dep khoa cần tìm
      * @return mảng Course nếu có, ngược lại null
      */
-    public Course[] findByDepartment(String dep) {
-        Course[] result = new Course[size];
-        int count = 0;
-        for (int i = 0; i < size; i++) {
+    public Course[] searchCourseByDepartment(String dep) {
+        Course[] result = new Course[count];
+        int found = 0;
+        for (int i = 0; i < count; i++) {
             if (courses[i].getDepartment().equalsIgnoreCase(dep)) {
-                result[count++] = courses[i];
+                result[found++] = courses[i];
             }
         }
-        return count > 0 ? Arrays.copyOf(result, count) : null;
+        return found > 0 ? Arrays.copyOf(result, found) : null;
     }
 
     /**
      * Sắp xếp các khóa học theo tên.
      * @return mảng Course đã sắp xếp
      */
-    public Course[] sortByTitle() {
-        Course[] sorted = Arrays.copyOf(courses, size);
+    public Course[] sortCourses() {
+        Course[] sorted = Arrays.copyOf(courses, count);
         Arrays.sort(sorted, (a, b) -> a.getTitle().compareToIgnoreCase(b.getTitle()));
         return sorted;
     }
@@ -129,35 +133,35 @@ public class CourseList {
      * Tìm các khóa học có số tín chỉ lớn nhất.
      * @return mảng Course có tín chỉ lớn nhất
      */
-    public Course[] findMaxCredit() {
-        if (size == 0) return null;
+    public Course[] findMaxCreditCourses() {
+        if (count == 0) return null;
         int max = courses[0].getCredit();
-        for (int i = 1; i < size; i++) {
+        for (int i = 1; i < count; i++) {
             if (courses[i].getCredit() > max) {
                 max = courses[i].getCredit();
             }
         }
-        Course[] result = new Course[size];
-        int count = 0;
-        for (int i = 0; i < size; i++) {
+        Course[] result = new Course[count];
+        int found = 0;
+        for (int i = 0; i < count; i++) {
             if (courses[i].getCredit() == max) {
-                result[count++] = courses[i];
+                result[found++] = courses[i];
             }
         }
-        return Arrays.copyOf(result, count);
+        return Arrays.copyOf(result, found);
     }
 
     /**
      * Tìm khoa có nhiều khóa học nhất.
      * @return tên khoa
      */
-    public String departmentWithMostCourses() {
-        if (size == 0) return null;
-        String[] deps = new String[size];
-        int[] counts = new int[size];
+    public String findDepartmentWithMostCourse() {
+        if (count == 0) return null;
+        String[] deps = new String[count];
+        int[] counts = new int[count];
         int uniqueDep = 0;
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < count; i++) {
             String dep = courses[i].getDepartment();
             int idx = -1;
             for (int j = 0; j < uniqueDep; j++) {
@@ -184,5 +188,4 @@ public class CourseList {
         }
         return deps[maxIndex];
     }
-
 }

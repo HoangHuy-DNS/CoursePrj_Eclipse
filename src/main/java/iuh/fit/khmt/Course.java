@@ -1,10 +1,3 @@
-/**
- * @description Course.java - This is Hoang Huy's code
- * @author Hoang Huy
- * @version 1.0
- * @created Aug 20, 2025 9:28:04 AM
- */
-
 package iuh.fit.khmt;
 
 /**
@@ -16,6 +9,12 @@ public class Course {
     private String title;
     private int credit;
     private String department;
+
+    /**
+     * Constructor mặc định.
+     */
+    public Course() {
+    }
 
     /**
      * Khởi tạo khóa học.
@@ -118,6 +117,4 @@ public class Course {
     public String toString() {
         return String.format("%-10s %-20s %-10d %-15s", id, title, credit, department);
     }
-
 }
-
